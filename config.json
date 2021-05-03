@@ -18,8 +18,9 @@
     "pretrained_weights": "./model_data/pre_weight.h5",
     "batch_size": 16,
     "learning_rate": 1e-3,
-    "nb_epochs": 1,
-    "warmup_epochs": 3,
+    "nb_epochs": 200,
+    "warmup_epochs": 20,
+    "workers" : 4,
     "saved_weights_name": "CNN_captcha_weight.h5",
     "debug": true
   },
