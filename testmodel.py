@@ -8,13 +8,14 @@ Created on Wed Aug 28 18:32:59 2019
 import json
 import os
 
+import numpy as np
 import pandas as pd
 from cv2 import resize, imread
 from keras import Model
 from keras.models import load_model
 
-from util import utils
-from util.utils import *
+from util.utils import my_acc, img_procrss
+from util import label_process
 
 
 def model(testpath):
@@ -35,7 +36,7 @@ def model(testpath):
 
     # predict
     predict = model.predict(X, batch_size=16)
-    ans = utils.decode_predict(predict)
+    ans = label_process.decode_predict(predict)
 
     # the format of result-file
     # 这里可以生成结果文件
@@ -58,7 +59,20 @@ def get_data(path):
     x = imread(filename=path)
 
     # 去噪,并归一化
-    x = utils.img_procrss(x)
+    x = img_procrss(x)
 
     x = resize(x, dsize=(120, 40))
     return x
+
+
+if __name__ == "__main__":
+    testpath = './data/test/'  # 测试集路径。包含验证码图片文件的文件夹
+    result_folder_path = './result.csv'  # 结果输出文件路径
+
+    # 调用自己的工程文件，并这里生成结果文件(dataframe)
+    result = model(testpath)
+    print(result)
+
+    # 注意路径不能更改，index需要设置为None
+    result.to_csv(result_folder_path, index=None)
+    # 参考代码结束：输出标准结果文件

@@ -89,7 +89,8 @@ class DataGenerator(Sequence):
         x = imread(filename=path)
 
         # 数据增强
-        if self.data_aug: x = self.aug_pipe.augment_image(x)
+        if self.data_aug:
+            x = self.aug_pipe.augment_image(x)
 
         # 预处理并归一化
         x = utils.img_procrss(x)
@@ -100,7 +101,7 @@ class DataGenerator(Sequence):
         y = label_process.process_label(label)
         return x, y
 
-    # 数据增强器
+    # 数据增广器
     def augmenter(self):
         sometimes = lambda aug: iaa.Sometimes(0.5, aug)
         aug = iaa.Sequential(
