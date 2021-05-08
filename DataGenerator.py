@@ -20,7 +20,7 @@ class DataGenerator(Sequence):
 
     '''
 
-    def __init__(self, data_file, data_dir, img_shape=(128, 128), batch_size=16, data_aug=False, prob=None,
+    def __init__(self, data_file, data_dir, img_shape=(128, 128), batch_size=16, data_aug=False, prob_from=0, prob_to=1,
                  shuffle=True):
         self.data_dir = data_dir
         self.img_shape = img_shape
@@ -45,10 +45,9 @@ class DataGenerator(Sequence):
         del self.data_list[0]  # 删除标题行
 
         # 划分数据
-        if prob != None:
-            begin = int(len(self.data_list) * prob[0])
-            end = int(len(self.data_list) * prob[1])
-            self.data_list = self.data_list[begin:end]
+        begin = int(len(self.data_list) * prob_from)
+        end = int(len(self.data_list) * prob_to)
+        self.data_list = self.data_list[begin:end]
 
         # 从data_list获取全部X, Y
         for line in self.data_list:

@@ -11,7 +11,8 @@ class Train:
     """
     train_data_folder = "/root/work/captcha/A/train/"
     train_data_file = "/root/work/captcha/A/train/train_label.csv"
-    train_prob = [0, 0.8]
+    train_prob_from = 0
+    train_prob_to = 0.8
 
     """
     超参数
@@ -36,7 +37,8 @@ class Valid:
     """
     valid_data_folder = "/root/work/captcha/A/train/"
     valid_data_file = "/root/work/captcha/A/train/train_label.csv"
-    valid_prob = [0.8, 1],
+    valid_prob_from = 0
+    valid_prob_to = 0.8
     valid_times = 1
 
 

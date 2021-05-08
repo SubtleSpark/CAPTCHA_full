@@ -10,7 +10,6 @@ from keras.callbacks import EarlyStopping, CSVLogger, ModelCheckpoint
 from keras.optimizers import *
 from DataGenerator import DataGenerator
 from NNModels import ResNet50, KerasResNet50, LeNet, SEResNet
-from config import *
 
 """
 1. 读取配置文件
@@ -24,7 +23,8 @@ model_path = config.Model.model_path
 pretrained_weights = config.Train.pretrained_weights
 train_file = config.Train.train_data_file
 train_dir = config.Train.train_data_folder
-train_prob = config.Train.train_prob
+train_prob_from = config.Train.train_prob_from
+train_prob_to = config.Train.train_prob_to
 
 # hyper-parameter
 train_workers = config.Train.workers
@@ -34,7 +34,8 @@ warmup_epochs = config.Train.warmup_epochs
 # valid
 valid_file = config.Valid.valid_data_file
 valid_dir = config.Valid.valid_data_folder
-valid_prob = config.Valid.valid_prob
+valid_prob_from = config.Valid.valid_prob_from
+valid_prob_to = config.Valid.valid_prob_to
 
 
 def main(weight_path: str = None):
@@ -69,7 +70,7 @@ def main(weight_path: str = None):
     # 训练数据生成器
     train_data_gen = DataGenerator(data_file=train_file, data_dir=train_dir, img_shape=(120, 40), batch_size=batch_size,
                                    data_aug=True,
-                                   prob=train_prob,
+                                   prob_from=train_prob_from,
                                    shuffle=True)
     # 验证数据生成器
     valid_data_gen = DataGenerator(data_file=valid_file, data_dir=valid_dir, img_shape=(120, 40), batch_size=batch_size,
