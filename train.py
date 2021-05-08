@@ -9,7 +9,7 @@ from keras.utils import plot_model
 from keras.callbacks import EarlyStopping, CSVLogger, ModelCheckpoint
 from keras.optimizers import *
 from DataGenerator import DataGenerator
-from NNModels import ResNet50, KerasResNet50, LeNet
+from NNModels import ResNet50, KerasResNet50, LeNet, SEResNet
 from config import *
 
 """
@@ -39,8 +39,8 @@ valid_prob = config.Valid.valid_prob
 
 def main(weight_path: str = None):
     # 加载模型结构
-    model = KerasResNet50.model(input_size=(40, 120, 3), regularizer=0.0001, droprate=0.5, weights=None)
-    KerasResNet50.fix(model, 'global_average_pooling2d_1')
+    model = SEResNet.model(input_size=(40, 120, 3), regularizer=0.0001, droprate=0.5)
+    # KerasResNet50.fix(model, 'global_average_pooling2d_1')
 
     """
     根据参数加载模型数据

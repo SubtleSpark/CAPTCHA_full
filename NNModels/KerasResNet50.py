@@ -1,9 +1,7 @@
 from keras import Input, Model
-from keras.callbacks import EarlyStopping, CSVLogger
 from keras.layers import BatchNormalization, Conv2D, LeakyReLU, MaxPooling2D, Flatten, Dropout, Dense, Concatenate, \
     Reshape, Add, Activation, AveragePooling2D, ZeroPadding2D
 from keras.regularizers import l2
-from keras import backend as K
 import keras
 
 
@@ -36,16 +34,23 @@ def KerasResNet50(input_size, regularizer=0, droprate=0.5, weights='imagenet'):
 
     return model
 
+
 """
 从第1层 ~ toLayer层冻结（不冻结toLayer），停止训练
 toLayer为某一层的name
 """
+
+
 def fix(base_model: Model, toLayer):
     for layer in base_model.layers:
         if (layer.name == toLayer):
             return base_model
         else:
             layer.trainable = False
+
+
+def fixExceptTop(model: Model):
+    fix(model, 'global_average_pooling2d_1')
 
 
 if __name__ == '__main__':

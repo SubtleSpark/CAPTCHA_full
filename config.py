@@ -16,8 +16,8 @@ class Train:
     """
     超参数
     """
-    batch_size = 16
-    learning_rate = 1e-3
+    batch_size = 64
+    learning_rate = 0.001
     nb_epochs = 200
     warmup_epochs = 20
 
