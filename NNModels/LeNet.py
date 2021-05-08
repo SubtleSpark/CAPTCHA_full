@@ -33,3 +33,7 @@ def LeNet(input_size, regularizer=0, droprate=0):
 
     model: Model = Model(X_input, pred, name="LeNet")
     return model
+
+
+if __name__ == '__main__':
+    model((128, 128, 3)).summary()

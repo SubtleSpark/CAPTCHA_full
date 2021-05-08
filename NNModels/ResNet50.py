@@ -83,7 +83,7 @@ def ResNet50(input_size, regularizer=0, droprate=0.5):
     return model
 
 
-def __identity_block(self, X, f, filters, stage, block):
+def __identity_block(X, f, filters, stage, block):
     # defining name basis
     conv_name_base = 'res' + str(stage) + block + '_branch'
     bn_name_base = 'bn' + str(stage) + block + '_branch'
@@ -119,7 +119,7 @@ def __identity_block(self, X, f, filters, stage, block):
     return X
 
 
-def __convolutional_block(self, X, f, filters, stage, block, s=2):
+def __convolutional_block(X, f, filters, stage, block, s=2):
     """
     Implementation of the convolutional block as defined in Figure 4
 
@@ -173,3 +173,5 @@ def __convolutional_block(self, X, f, filters, stage, block, s=2):
 
 
 """ResNet End"""
+if __name__ == '__main__':
+    model((128, 128, 3)).summary()

@@ -1,43 +1,43 @@
-import json
 import os
 import keras.backend.tensorflow_backend as K
 
 from keras.metrics import categorical_accuracy
+
+import config
 from util.utils import my_acc
 from keras.utils import plot_model
 from keras.callbacks import EarlyStopping, CSVLogger, ModelCheckpoint
 from keras.optimizers import *
 from DataGenerator import DataGenerator
 from NNModels import ResNet50, KerasResNet50, LeNet
+from config import *
 
 """
 1. 读取配置文件
 2. 加载各个类型的配置数据
 """
-# 读取配置文件
-config_path = r'./config.json'
-with open(config_path) as config_buffer:
-    config = json.loads(config_buffer.read())
-
 # model
-model_data = config['model']['model_data']
-model_path = config['model']['model_path']
+model_data = config.Model.model_data
+model_path = config.Model.model_path
 
 # train
-pretrained_weights = config['train']['pretrained_weights']
-train_file = config['train']['train_data_file']
-train_dir = config['train']['train_data_folder']
-train_prob = config['train']['train_prob']
-train_workers = config['train']['workers']
-batch_size = config['train']['batch_size']
-warmup_epochs = config['train']['warmup_epochs']
+pretrained_weights = config.Train.pretrained_weights
+train_file = config.Train.train_data_file
+train_dir = config.Train.train_data_folder
+train_prob = config.Train.train_prob
+
+# hyper-parameter
+train_workers = config.Train.workers
+batch_size = config.Train.batch_size
+warmup_epochs = config.Train.warmup_epochs
+
 # valid
-valid_file = config['valid']['valid_data_file']
-valid_dir = config['valid']['valid_data_folder']
-valid_prob = config['valid']['valid_prob']
+valid_file = config.Valid.valid_data_file
+valid_dir = config.Valid.valid_data_folder
+valid_prob = config.Valid.valid_prob
 
 
-def main(load_best_weight=False, load_pre_weight=False):
+def main(weight_path: str = None):
     # 加载模型结构
     model = KerasResNet50.model(input_size=(40, 120, 3), regularizer=0.0001, droprate=0.5, weights=None)
     KerasResNet50.fix(model, 'global_average_pooling2d_1')
@@ -45,26 +45,15 @@ def main(load_best_weight=False, load_pre_weight=False):
     """
     根据参数加载模型数据
     """
-    # 读取预训练权重
-    if load_pre_weight:
+    # 读取权重
+    if weight_path != None:
         try:
-            pretrained_weights = r"./model_data/model.118-0.06.h5"
-            print(pretrained_weights)
+            print(weight_path)
             model.load_weights(filepath=pretrained_weights, by_name=True, skip_mismatch=True)
         except:
             print('pre weights not load')
         else:
             print('pre weights has load')
-
-    # 最好的权重
-    elif load_best_weight:
-        try:
-            print(model_path)
-            model.load_weights(filepath=model_path, by_name=True, skip_mismatch=True)
-        except:
-            print('best weights not load')
-        else:
-            print('best weights has load')
 
     plot_model(model=model, to_file=os.path.join(model_data, 'model.png'), show_shapes=True)
     # model.summary()
@@ -94,6 +83,7 @@ def main(load_best_weight=False, load_pre_weight=False):
     2. 正式训练
     """
     # warmup
+    print(model.optimizer)
     model.fit_generator(train_data_gen,
                         epochs=warmup_epochs,
                         validation_data=valid_data_gen,
@@ -102,6 +92,7 @@ def main(load_best_weight=False, load_pre_weight=False):
     callbacks = [  # EarlyStopping(monitor='val_loss', patience=10),
         CSVLogger(os.path.join(model_data, 'train_log.csv')),
 
+        # filepath = "./model_data/model.{epoch:02d}-{val_loss:.8f}.h5"
         ModelCheckpoint(filepath="./model_data/model.{epoch:02d}-{val_loss:.8f}.h5",
                         monitor='val_loss',
                         verbose=1,
@@ -119,4 +110,4 @@ def main(load_best_weight=False, load_pre_weight=False):
 
 
 if __name__ == '__main__':
-    main(load_best_weight=False, load_pre_weight=False)
+    main()
