@@ -71,11 +71,13 @@ def main(weight_path: str = None):
     train_data_gen = DataGenerator(data_file=train_file, data_dir=train_dir, img_shape=(120, 40), batch_size=batch_size,
                                    data_aug=True,
                                    prob_from=train_prob_from,
+                                   prob_to=train_prob_to,
                                    shuffle=True)
     # 验证数据生成器
     valid_data_gen = DataGenerator(data_file=valid_file, data_dir=valid_dir, img_shape=(120, 40), batch_size=batch_size,
                                    data_aug=False,
-                                   prob=valid_prob,
+                                   prob_from=valid_prob_from,
+                                   prob_to=valid_prob_to,
                                    shuffle=True)
 
     """
