@@ -17,7 +17,6 @@ from NNModels import ResNet50, KerasResNet50, LeNet, SEResNet
 """
 # model
 model_data = config.Model.model_data
-model_path = config.Model.model_path
 
 # train
 pretrained_weights = config.Train.pretrained_weights
@@ -85,13 +84,13 @@ def main(weight_path: str = None):
     1. warmup
     2. 正式训练
     """
-    # warmup
+    # 1. warmup
     print(model.optimizer)
     model.fit_generator(train_data_gen,
                         epochs=warmup_epochs,
                         validation_data=valid_data_gen,
                         workers=train_workers)
-    # 正式训练
+    # 2. 正式训练
     callbacks = [  # EarlyStopping(monitor='val_loss', patience=10),
         CSVLogger(os.path.join(model_data, 'train_log.csv')),
 

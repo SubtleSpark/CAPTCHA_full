@@ -1,7 +1,7 @@
 class Model:
-    backend = "tensorflow"
-    model_data = "./model_data"
-    model_path = "./model_data/cnn_best.h5"
+    backend = "tensorflow"                  # 未使用
+    model_data = "./model_data"             # 训练生成的checkpoint和日志文件保存的文件夹
+    model_path = "./model_data/cnn_best.h5" # 加载的模型
     input_size = [128, 128]
 
 
@@ -17,7 +17,7 @@ class Train:
     """
     超参数
     """
-    batch_size = 64
+    batch_size = 2
     learning_rate = 0.001
     nb_epochs = 200
     warmup_epochs = 20
@@ -45,3 +45,13 @@ class Valid:
 class Predict:
     predict_data_folder = "./data/test",
     predict_data_file = "./data/submission.csv"
+
+
+"""
+本地测试时需要重写的路径
+"""
+Train.train_data_folder = "F:/data_set/captcha/A/train/"
+Train.train_data_file = "F:/data_set/captcha/A/train/train_label.csv"
+
+Valid.valid_data_folder = "F:/data_set/captcha/A/train/"
+Valid.valid_data_file = "F:/data_set/captcha/A/train/train_label.csv"

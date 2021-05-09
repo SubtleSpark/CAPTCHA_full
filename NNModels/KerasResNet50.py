@@ -54,7 +54,8 @@ def fixExceptTop(model: Model):
 
 
 if __name__ == '__main__':
-    KResNet = model((128, 128, 3), weights=None)
-    fix(KResNet, 'global_average_pooling2d_1')
-    for layer in KResNet.layers:
-        print(layer.name, ' is trainable? ', layer.trainable)
+    from keras.utils import plot_model
+
+    nnm = model((128, 128, 3))
+    nnm.summary()
+    plot_model(model=nnm, to_file='../model_data/model_summary/' + nnm.name + '_Model.png', show_shapes=True)

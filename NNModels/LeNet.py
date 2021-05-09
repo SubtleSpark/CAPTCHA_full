@@ -1,10 +1,7 @@
 from keras import Input, Model
-from keras.callbacks import EarlyStopping, CSVLogger
-from keras.layers import BatchNormalization, Conv2D, LeakyReLU, MaxPooling2D, Flatten, Dropout, Dense, Concatenate, \
-    Reshape, Add, Activation, AveragePooling2D, ZeroPadding2D
+from keras.layers import BatchNormalization, Conv2D, MaxPooling2D, Flatten, Dropout, Dense, Concatenate, \
+    Reshape, Activation
 from keras.regularizers import l2
-from keras import backend as K
-import keras
 
 
 def model(input_size, regularizer=0, droprate=0):
@@ -36,4 +33,8 @@ def LeNet(input_size, regularizer=0, droprate=0):
 
 
 if __name__ == '__main__':
-    model((128, 128, 3)).summary()
+    from keras.utils import plot_model
+
+    nnm = model((128, 128, 3))
+    nnm.summary()
+    plot_model(model=nnm, to_file='../model_data/model_summary/' + nnm.name + '_Model.png', show_shapes=True)

@@ -1,6 +1,3 @@
-import keras
-import tensorflow as tf
-from keras.utils import plot_model
 from keras.regularizers import l2
 from keras.layers import *
 from keras import Model
@@ -62,7 +59,7 @@ def SEResNet50(input_shape, regularizer, droprate):
     X = Concatenate(axis=-1)([X1, X2, X3, X4])
     model_output = Reshape(target_shape=(4, 62))(X)
 
-    model = Model(model_input, model_output)
+    model = Model(model_input, model_output, name="SEResNet50")
     return model
 
 
@@ -107,6 +104,8 @@ def __conv_block(input_layer, filters):
 
 
 if __name__ == '__main__':
+    from keras.utils import plot_model
+
     nnm = model((128, 128, 3))
     nnm.summary()
-    plot_model(model=nnm, to_file='../model_data/SE_ResNet50_Model.png', show_shapes=True)
+    plot_model(model=nnm, to_file='../model_data/model_summary/' + nnm.name + '_Model.png', show_shapes=True)
