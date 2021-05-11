@@ -14,7 +14,8 @@ from cv2 import resize, imread
 from keras import Model
 from keras.models import load_model
 
-from util.utils import my_acc, img_procrss
+from util.preprocessor import img_procrss
+from util.modelUtils import word_acc
 from util import label_process
 
 
@@ -25,7 +26,7 @@ def model(testpath):
 
     # load model
     model_path = r"./model_data/cnn_best.h5"
-    model: Model = load_model(model_path, custom_objects={"my_acc": my_acc})
+    model: Model = load_model(model_path, custom_objects={"my_acc": word_acc})
 
     # load data
     print("reading start!")

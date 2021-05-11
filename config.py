@@ -23,7 +23,7 @@ class Train:
     warmup_epochs = 20
 
     """
-    模型数据
+    模型数据及其他
     """
     workers = 4
     pretrained_weights = "./model_data/pre_weight.h5"  # 预训练权重

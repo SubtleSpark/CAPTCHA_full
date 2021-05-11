@@ -4,7 +4,7 @@ import cv2
 
 from cv2 import resize, imread, imshow, waitKey  # BGR
 from keras.utils import Sequence
-from util import utils
+from util import preprocessor
 from util import label_process
 
 import imgaug as ia
@@ -92,7 +92,7 @@ class DataGenerator(Sequence):
             x = self.aug_pipe.augment_image(x)
 
         # 预处理并归一化
-        x = utils.img_procrss(x)
+        x = preprocessor.img_procrss(x)
 
         # resize
         x = resize(x, dsize=self.img_shape)

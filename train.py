@@ -1,15 +1,12 @@
 import os
-import keras.backend.tensorflow_backend as K
-
-from keras.metrics import categorical_accuracy
-
 import config
-from util.utils import my_acc
+from util.modelUtils import word_acc
 from keras.utils import plot_model
 from keras.callbacks import EarlyStopping, CSVLogger, ModelCheckpoint
 from keras.optimizers import *
 from DataGenerator import DataGenerator
-from NNModels import ResNet50, KerasResNet50, LeNet, SEResNet
+import NNModels
+from NNModels import LeNet, SEResNet50, KerasResNet50
 
 """
 1. 读取配置文件
@@ -39,8 +36,8 @@ valid_prob_to = config.Valid.valid_prob_to
 
 def main(weight_path: str = None):
     # 加载模型结构
-    model = SEResNet.model(input_size=(40, 120, 3), regularizer=0.0001, droprate=0.5)
-    # KerasResNet50.fix(model, 'global_average_pooling2d_1')
+    nnm = SEResNet50(inputShape=((40, 120, 3)), regularizer=0.001, droprate=0.5)
+    model = nnm.getModel()
 
     """
     根据参数加载模型数据
@@ -61,7 +58,7 @@ def main(weight_path: str = None):
     # 编译模型
     model.compile(loss='categorical_crossentropy',
                   optimizer=Adam(0.001, amsgrad=True),
-                  metrics=['accuracy', my_acc])
+                  metrics=['accuracy', word_acc])
 
     """
     创建数据生成器

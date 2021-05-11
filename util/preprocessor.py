@@ -2,8 +2,6 @@ import string
 
 import cv2
 import numpy as np
-import keras.backend as K
-from keras.metrics import categorical_accuracy
 
 
 def RGBAlgorithm(rgb_img, value=0.5, basedOnCurrentValue=True):
@@ -62,11 +60,3 @@ def img_procrss(img):
 
     return result
 
-
-def my_acc(y_true, y_pred):
-    out = categorical_accuracy(y_true=y_true, y_pred=y_pred)
-    return K.min(out, axis=-1)
-
-
-if __name__ == '__main__':
-    pass
