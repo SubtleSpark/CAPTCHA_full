@@ -5,17 +5,14 @@ from .MyModel import MyModel
 
 
 class SEResNet50(MyModel):
-    def __init__(self, inputShape=(120, 40, 3), droprate=0.5, regularizer=0.01):
+    def __init__(self, inputShape=(40, 120, 3), droprate=0.5, regularizer=0.01):
         super().__init__(inputShape=inputShape, droprate=droprate, regularizer=regularizer)
-        self.model = self.createModel()
 
     """
     相较原始SEResNet50，每一层通道变为原来一半
     """
 
     def createModel(self):
-        print("[INFO] Using SEResNet50")
-
         model_input = Input(shape=self.inputShape)
         identity_blocks = [3, 4, 6, 3]
         # Block 1
@@ -60,7 +57,7 @@ class SEResNet50(MyModel):
         添加 top 分类器
         """
         model_output = self.top(self.droprate, self.regularizer, pooling)
-        model: Model = Model(inputs=model_input, outputs=model_output, name='KerasResNet50')
+        model: Model = Model(inputs=model_input, outputs=model_output, name=self.__class__.__name__)
 
         return model
 
@@ -101,8 +98,3 @@ class SEResNet50(MyModel):
         layer = BatchNormalization()(layer)
         layer = ReLU()(layer)
         return layer
-
-
-if __name__ == '__main__':
-    nnm = SEResNet50()
-    nnm.showModelDetail()

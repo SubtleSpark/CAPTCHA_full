@@ -4,13 +4,11 @@ from .MyModel import MyModel
 
 
 class KerasResNet50(MyModel):
-    def __init__(self, inputShape=(120, 40, 3), droprate=0.5, regularizer=0.001, weights='imagenet'):
-        super().__init__(inputShape=inputShape, droprate=droprate, regularizer=regularizer)
+    def __init__(self, inputShape=(40, 120, 3), droprate=0.5, regularizer=0.001, weights='imagenet'):
         self.weights = weights
-        self.model = self.createModel()
+        super().__init__(inputShape=inputShape, droprate=droprate, regularizer=regularizer)
 
     def createModel(self):
-        print("[INFO] Using KerasResNet50")
         input_tensor = Input(shape=self.inputShape)
         base_model = keras.applications.ResNet50(input_tensor=input_tensor,
                                                  include_top=False,
@@ -22,7 +20,7 @@ class KerasResNet50(MyModel):
         添加 top 分类器
         """
         model_output = self.top(self.droprate, self.regularizer, X)
-        model: Model = Model(inputs=input_tensor, outputs=model_output, name='KerasResNet50')
+        model: Model = Model(inputs=input_tensor, outputs=model_output, name=self.__class__.__name__)
 
         return model
 
@@ -30,9 +28,3 @@ class KerasResNet50(MyModel):
         self.fix('global_average_pooling2d_1')
 
 
-if __name__ == '__main__':
-    nnm = KerasResNet50()
-    nnm.fixExceptTop()
-    model = nnm.getModel()
-    for layer in model.layers:
-        print(layer.name + "--->" + str(layer.trainable))

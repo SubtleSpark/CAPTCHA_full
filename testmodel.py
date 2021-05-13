@@ -14,9 +14,9 @@ from cv2 import resize, imread
 from keras import Model
 from keras.models import load_model
 
-from util.preprocessor import img_procrss
+from util.imageProcess import img_procrss
 from util.modelUtils import word_acc
-from util import label_process
+from util import labelProcess
 
 
 def model(testpath):
@@ -37,7 +37,7 @@ def model(testpath):
 
     # predict
     predict = model.predict(X, batch_size=16)
-    ans = label_process.decode_predict(predict)
+    ans = labelProcess.decode_predict(predict)
 
     # the format of result-file
     # 这里可以生成结果文件

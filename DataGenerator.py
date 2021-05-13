@@ -4,10 +4,8 @@ import cv2
 
 from cv2 import resize, imread, imshow, waitKey  # BGR
 from keras.utils import Sequence
-from util import preprocessor
-from util import label_process
+from util import imageProcess, imageArgument, labelProcess
 
-import imgaug as ia
 from imgaug import augmenters as iaa
 
 
@@ -29,7 +27,7 @@ class DataGenerator(Sequence):
         self.shuffle = shuffle
 
         # 数据增强器
-        self.aug_pipe = self.augmenter()
+        self.aug_pipe = imageArgument.getAugPipe()
 
         # 数据字典
         self.data_list = []
@@ -92,50 +90,11 @@ class DataGenerator(Sequence):
             x = self.aug_pipe.augment_image(x)
 
         # 预处理并归一化
-        x = preprocessor.img_procrss(x)
+        x = imageProcess.img_procrss(x)
 
         # resize
         x = resize(x, dsize=self.img_shape)
 
-        y = label_process.process_label(label)
+        y = labelProcess.process_label(label)
         return x, y
 
-    # 数据增广器
-    def augmenter(self):
-        sometimes = lambda aug: iaa.Sometimes(0.5, aug)
-        aug = iaa.Sequential(
-            [
-                iaa.SomeOf((1, 3), [
-                    # iaa.PiecewiseAffine(scale=(0.02, 0.03)),
-                    iaa.Add(value=(-40, 40), per_channel=0.5),
-                    iaa.AdditiveGaussianNoise(scale=(0, 0.1 * 255), per_channel=True),
-                    iaa.Multiply((0.5, 1.5), per_channel=0.5)
-                ], random_order=True)
-            ],
-            random_order=True
-        )
-        return aug
-
-
-# 测试
-if __name__ == '__main__':
-    print("[INFO] test DataGenerator")
-    basepath = r'F:\data_set\captcha'
-    data_file = os.path.join(basepath, 'A', 'train', 'train_label.csv')
-    data_dir = os.path.join(basepath, 'A', 'train')
-    batch_size = 16
-
-    data_gen = DataGenerator(data_file=data_file, data_dir=data_dir, img_shape=(120, 40), batch_size=batch_size,
-                             prob=[0.0, 0.2],
-                             shuffle=False)
-    print(data_gen.data_list.__len__())
-    print(data_gen.data_list[0:10])
-
-    X, Y = data_gen.__getitem__(1)
-    print(X.shape)
-    print(Y.shape)
-
-    print(Y[0])
-    print(X[0][0][0])
-    imshow(winname='test', mat=X[0])
-    waitKey(0)

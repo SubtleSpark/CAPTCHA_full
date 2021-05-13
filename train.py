@@ -5,8 +5,7 @@ from keras.utils import plot_model
 from keras.callbacks import EarlyStopping, CSVLogger, ModelCheckpoint
 from keras.optimizers import *
 from DataGenerator import DataGenerator
-import NNModels
-from NNModels import LeNet, SEResNet50, KerasResNet50
+from NNModels import MyModel, VGG, SEResNet50, KerasResNet50, ResNet34
 
 """
 1. 读取配置文件
@@ -14,6 +13,8 @@ from NNModels import LeNet, SEResNet50, KerasResNet50
 """
 # model
 model_data = config.Model.model_data
+model_name = config.Model.backend
+input_shape = config.Model.input_shape
 
 # train
 pretrained_weights = config.Train.pretrained_weights
@@ -36,28 +37,29 @@ valid_prob_to = config.Valid.valid_prob_to
 
 def main(weight_path: str = None):
     # 加载模型结构
-    nnm = SEResNet50(inputShape=((40, 120, 3)), regularizer=0.001, droprate=0.5)
+    nnm: MyModel = None
+    if model_name == 'SEResNet50':
+        nnm = SEResNet50(inputShape=input_shape, regularizer=0.001, droprate=0.5)
+    elif model_name == 'KerasResNet50':
+        nnm = KerasResNet50(inputShape=input_shape, regularizer=0.001, droprate=0.5)
+    elif model_name == 'VGG':
+        nnm = VGG(inputShape=input_shape, regularizer=0.001, droprate=0.5)
+    elif model_name == 'ResNet34':
+        nnm = ResNet34(inputShape=input_shape, regularizer=0.001, droprate=0.5)
+
     model = nnm.getModel()
 
     """
     根据参数加载模型数据
     """
     # 读取权重
-    if weight_path != None:
-        try:
-            print(weight_path)
-            model.load_weights(filepath=pretrained_weights, by_name=True, skip_mismatch=True)
-        except:
-            print('pre weights not load')
-        else:
-            print('pre weights has load')
-
-    plot_model(model=model, to_file=os.path.join(model_data, 'model.png'), show_shapes=True)
-    # model.summary()
+    if weight_path is not None:
+        print(weight_path)
+        model.load_weights(filepath=pretrained_weights, by_name=True, skip_mismatch=False)
 
     # 编译模型
-    model.compile(loss='categorical_crossentropy',
-                  optimizer=Adam(0.001, amsgrad=True),
+    model.compile(optimizer=Adam(0.001, amsgrad=True),
+                  loss='categorical_crossentropy',
                   metrics=['accuracy', word_acc])
 
     """
@@ -74,7 +76,7 @@ def main(weight_path: str = None):
                                    data_aug=False,
                                    prob_from=valid_prob_from,
                                    prob_to=valid_prob_to,
-                                   shuffle=True)
+                                   shuffle=False)
 
     """
     训练：
@@ -82,23 +84,30 @@ def main(weight_path: str = None):
     2. 正式训练
     """
     # 1. warmup
-    print(model.optimizer)
-    model.fit_generator(train_data_gen,
-                        epochs=warmup_epochs,
-                        validation_data=valid_data_gen,
-                        workers=train_workers)
-    # 2. 正式训练
-    callbacks = [  # EarlyStopping(monitor='val_loss', patience=10),
-        CSVLogger(os.path.join(model_data, 'train_log.csv')),
+    if warmup_epochs > 0:
+        print('[INFO]  warmup 训练')
+        model.fit_generator(train_data_gen,
+                            epochs=warmup_epochs,
+                            validation_data=valid_data_gen,
+                            workers=train_workers)
 
-        # filepath = "./model_data/model.{epoch:02d}-{val_loss:.8f}.h5"
-        ModelCheckpoint(filepath="./model_data/model.{epoch:02d}-{val_loss:.8f}.h5",
-                        monitor='val_loss',
-                        verbose=1,
-                        save_best_only=False,
-                        save_weights_only=False,
-                        mode='auto',
-                        period=2)]
+    # 2. 正式训练
+    print('[INFO]  正式训练')
+    # 创建保存训练结果的文件夹
+    if not (os.path.exists(os.path.join(model_data, model.name, 'checkpoints'))):
+        os.makedirs(os.path.join(model_data, model.name, 'checkpoints'))
+
+    # filepath = "./model_data/model.{epoch:02d}-{val_loss:.8f}.h5"
+    filepath = os.path.join(model_data, model.name, 'checkpoints', model.name + '.h5')
+    callbacks = [EarlyStopping(monitor='val_loss', patience=18),
+                 CSVLogger(os.path.join(model_data, model.name, 'train_log.csv')),
+                 ModelCheckpoint(filepath=filepath,
+                                 monitor='val_loss',
+                                 verbose=1,
+                                 save_best_only=True,
+                                 save_weights_only=False,
+                                 mode='auto',
+                                 period=1)]
 
     model.fit_generator(train_data_gen,
                         epochs=200,

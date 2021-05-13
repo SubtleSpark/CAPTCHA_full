@@ -1,8 +1,8 @@
 class Model:
-    backend = "tensorflow"  # 未使用
+    backend = "VGG"  # 使用的模型 NNModels 中的 模型名
     model_data = "./model_data"  # 训练生成的checkpoint和日志文件保存的文件夹
     model_path = "./model_data/cnn_best.h5"  # 加载的模型
-    input_size = [128, 128]
+    input_shape = (40, 120, 3)
 
 
 class Train:
@@ -19,8 +19,8 @@ class Train:
     """
     batch_size = 32
     learning_rate = 0.001
-    nb_epochs = 200
     warmup_epochs = 20
+    nb_epochs = 200
 
     """
     模型数据及其他
@@ -56,6 +56,8 @@ if sys.platform == "win32":
     Train.train_data_folder = "F:/data_set/captcha/A/train/"
     Train.train_data_file = "F:/data_set/captcha/A/train/train_label.csv"
     Train.batch_size = 2
+    Train.warmup_epochs = 0
+    Train.workers = 1
 
     Valid.valid_data_folder = "F:/data_set/captcha/A/train/"
     Valid.valid_data_file = "F:/data_set/captcha/A/train/train_label.csv"

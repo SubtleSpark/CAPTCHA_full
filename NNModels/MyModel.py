@@ -13,13 +13,42 @@ class MyModel:
     2. 重写 createModel 方法。 方法返回一个 keras.Model
     3. 在子类的 __init__ 方法中调用：
         self.model = self.createModel()
+
+    Example:
+    ```python
+    class VGG(MyModel):
+
+    def __init__(self, inputShape=(120, 40, 3), droprate=0.5, regularizer=0.01):
+        super().__init__(inputShape=inputShape, droprate=droprate, regularizer=regularizer)
+        self.model = self.createModel()
+
+    def createModel(self):
+        print("[INFO] Using VGG")
+        X_input = Input(shape=self.inputShape)
+        X = X_input
+        for i, n_cnn in enumerate([2, 2, 3, 3, 3]):
+            for j in range(n_cnn):
+                X = Conv2D(32 * 2 ** min(i, 3), kernel_size=3, padding='same')(X)
+                X = BatchNormalization()(X)
+                X = Activation('relu')(X)
+            X = MaxPooling2D(2)(X)
+
+        X = Flatten()(X)
+
+
+        # 添加 top 分类器
+        model_output = self.top(self.droprate, self.regularizer, X)
+        model: Model = Model(X_input, model_output, name="VGG")
+        return model
+    ```
     """
 
     def __init__(self, inputShape, droprate, regularizer):
         self.inputShape = inputShape
         self.droprate = droprate
         self.regularizer = regularizer
-        self.model: Model = None
+        self.model: Model = self.createModel()
+        print('[INFO] Using ' + self.__class__.__name__)
 
     def getModel(self):
         return self.model

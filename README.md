@@ -1,8 +1,17 @@
 # CAPTCHA_full 验证码识别完整项目
 
+## 让项目跑起来
+1. 运行`sh request.sh`安装必要的包
+2. config.py 下配置好正确的参数
+3. 运行 train.py 训练模型
+4. （微调模型）
+5. （多模型融合）
+6. 预测
+
+
 ## 1. 在config.json中配置数据集路径
 
-（以后可能将config.py作为配置文件）
+（以后可能将`config.py`作为配置文件）
 
 `config.json` 中的属性 示例及解释
 ```json
@@ -53,9 +62,9 @@
 ## 2.运行`train.py`训练模型
 1. 运行`train.py`训练模型
 
-2. `model_data/train_log.csv`会实时记录训练数据
+2. `model_data/{model_name}/train_log.csv`会实时记录训练数据
 
-3. 模型会保存在`model_data`文件夹下
+3. 模型会保存在`model_data/{model_name}/checkpoint/`文件夹下
 
 ## 3.
 
