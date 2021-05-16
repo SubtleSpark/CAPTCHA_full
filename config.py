@@ -1,8 +1,14 @@
 class Model:
+    """
+    模型相关参数
+    """
     backend = "VGG"  # 使用的模型 NNModels 中的 模型名
     model_data = "./model_data"  # 训练生成的checkpoint和日志文件保存的文件夹
     model_path = "./model_data/cnn_best.h5"  # 加载的模型
-    input_shape = (40, 120, 3)
+    __h__ = 64      # 图片高度
+    __w__ = 256     # 图片宽度
+    input_shape = (__h__, __w__, 3)  # 模型输入为（h, w, c）  cv的图像大小为(w, h)
+    img_shape = (__w__, __h__)
 
 
 class Train:
@@ -19,7 +25,7 @@ class Train:
     """
     batch_size = 32
     learning_rate = 0.001
-    warmup_epochs = 20
+    warmup_epochs = 5
     nb_epochs = 200
 
     """

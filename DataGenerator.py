@@ -6,8 +6,6 @@ from cv2 import resize, imread, imshow, waitKey  # BGR
 from keras.utils import Sequence
 from util import imageProcess, imageArgument, labelProcess
 
-from imgaug import augmenters as iaa
-
 
 class DataGenerator(Sequence):
     '''
@@ -15,7 +13,7 @@ class DataGenerator(Sequence):
         data_file: 保存数据集的文本文件路径
         data_dir: 保存数据集文件夹
         prob:       list 用于划分训练集
-
+        img_shape=(w, h)
     '''
 
     def __init__(self, data_file, data_dir, img_shape=(128, 128), batch_size=16, data_aug=False, prob_from=0, prob_to=1,
@@ -90,11 +88,7 @@ class DataGenerator(Sequence):
             x = self.aug_pipe.augment_image(x)
 
         # 预处理并归一化
-        x = imageProcess.img_procrss(x)
-
-        # resize
-        x = resize(x, dsize=self.img_shape)
+        x = imageProcess.imgProcessNorm(x, self.img_shape)
 
         y = labelProcess.process_label(label)
         return x, y
-

@@ -3,7 +3,7 @@ import keras
 from .MyModel import MyModel
 
 
-class KerasResNet50(MyModel):
+class ResNet50(MyModel):
     def __init__(self, inputShape=(40, 120, 3), droprate=0.5, regularizer=0.001, weights='imagenet'):
         self.weights = weights
         super().__init__(inputShape=inputShape, droprate=droprate, regularizer=regularizer)

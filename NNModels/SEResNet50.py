@@ -11,7 +11,6 @@ class SEResNet50(MyModel):
     """
     相较原始SEResNet50，每一层通道变为原来一半
     """
-
     def createModel(self):
         model_input = Input(shape=self.inputShape)
         identity_blocks = [3, 4, 6, 3]

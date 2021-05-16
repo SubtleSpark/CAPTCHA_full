@@ -14,7 +14,7 @@ from cv2 import resize, imread
 from keras import Model
 from keras.models import load_model
 
-from util.imageProcess import img_procrss
+from util.imageProcess import imgProcessNorm
 from util.modelUtils import word_acc
 from util import labelProcess
 
@@ -60,7 +60,7 @@ def get_data(path):
     x = imread(filename=path)
 
     # 去噪,并归一化
-    x = img_procrss(x)
+    x = imgProcessNorm(x)
 
     x = resize(x, dsize=(120, 40))
     return x

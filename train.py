@@ -5,7 +5,7 @@ from keras.utils import plot_model
 from keras.callbacks import EarlyStopping, CSVLogger, ModelCheckpoint
 from keras.optimizers import *
 from DataGenerator import DataGenerator
-from NNModels import MyModel, VGG, SEResNet50, KerasResNet50, ResNet34
+from NNModels import MyModel, VGG, SEResNet50, ResNet50, ResNet34
 
 """
 1. 读取配置文件
@@ -15,6 +15,7 @@ from NNModels import MyModel, VGG, SEResNet50, KerasResNet50, ResNet34
 model_data = config.Model.model_data
 model_name = config.Model.backend
 input_shape = config.Model.input_shape
+img_shape = config.Model.img_shape
 
 # train
 pretrained_weights = config.Train.pretrained_weights
@@ -40,8 +41,8 @@ def main(weight_path: str = None):
     nnm: MyModel = None
     if model_name == 'SEResNet50':
         nnm = SEResNet50(inputShape=input_shape, regularizer=0.001, droprate=0.5)
-    elif model_name == 'KerasResNet50':
-        nnm = KerasResNet50(inputShape=input_shape, regularizer=0.001, droprate=0.5)
+    elif model_name == 'ResNet50':
+        nnm = ResNet50(inputShape=input_shape, regularizer=0.001, droprate=0.5)
     elif model_name == 'VGG':
         nnm = VGG(inputShape=input_shape, regularizer=0.001, droprate=0.5)
     elif model_name == 'ResNet34':
@@ -66,13 +67,13 @@ def main(weight_path: str = None):
     创建数据生成器
     """
     # 训练数据生成器
-    train_data_gen = DataGenerator(data_file=train_file, data_dir=train_dir, img_shape=(120, 40), batch_size=batch_size,
+    train_data_gen = DataGenerator(data_file=train_file, data_dir=train_dir, img_shape=img_shape, batch_size=batch_size,
                                    data_aug=True,
                                    prob_from=train_prob_from,
                                    prob_to=train_prob_to,
                                    shuffle=True)
     # 验证数据生成器
-    valid_data_gen = DataGenerator(data_file=valid_file, data_dir=valid_dir, img_shape=(120, 40), batch_size=batch_size,
+    valid_data_gen = DataGenerator(data_file=valid_file, data_dir=valid_dir, img_shape=img_shape, batch_size=batch_size,
                                    data_aug=False,
                                    prob_from=valid_prob_from,
                                    prob_to=valid_prob_to,
@@ -107,7 +108,7 @@ def main(weight_path: str = None):
                                  save_best_only=True,
                                  save_weights_only=False,
                                  mode='auto',
-                                 period=1)]
+                                 period=2)]
 
     model.fit_generator(train_data_gen,
                         epochs=200,

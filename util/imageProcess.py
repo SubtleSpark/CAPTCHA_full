@@ -2,6 +2,7 @@ import string
 
 import cv2
 import numpy as np
+import config
 
 
 def RGBAlgorithm(rgb_img, value=0.5, basedOnCurrentValue=True):
@@ -49,14 +50,15 @@ def RGBAlgorithm(rgb_img, value=0.5, basedOnCurrentValue=True):
     return img_out
 
 
-def img_procrss(img):
+def imgProcessNorm(img, shape):
     # 中值滤波
-    medBlur = cv2.medianBlur(img, ksize=3)
+    res = cv2.medianBlur(img, ksize=3)
     # 亮度
-    light = RGBAlgorithm(medBlur, value=0.5)
+    # res = RGBAlgorithm(res, value=0.5)
+
+    # reshape
+    res = cv2.resize(src=res, dsize=shape)
     # 归一化
-    result = np.zeros(img.shape, dtype=np.float32)
-    cv2.normalize(light, dst=result, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+    cv2.normalize(src=res, dst=res, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
 
-    return result
-
+    return res

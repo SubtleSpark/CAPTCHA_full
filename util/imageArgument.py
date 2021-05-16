@@ -104,15 +104,15 @@ import imgaug as ia
 
 # 数据增广器
 def getAugPipe():
-    sometimes = lambda aug: iaa.Sometimes(0.5, aug)
     aug = iaa.Sequential(
         [
             iaa.SomeOf((1, 3), [
-                # iaa.PiecewiseAffine(scale=(0.02, 0.03)),
+                iaa.PiecewiseAffine(scale=(0.02, 0.03)),
                 iaa.Add(value=(-40, 40), per_channel=0.5),
                 iaa.AdditiveGaussianNoise(scale=(0, 0.1 * 255), per_channel=True),
                 iaa.Multiply((0.5, 1.5), per_channel=0.5)
-            ], random_order=True)
+            ], random_order=True),
+            iaa.ChannelShuffle()
         ],
         random_order=True
     )

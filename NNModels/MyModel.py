@@ -75,6 +75,7 @@ class MyModel:
             return
 
         self.model.summary()
+        print('[INFO] ' +  self.model.name + 'is plotting')
         plot_model(model=self.model, to_file='../model_data/model_summary/' + self.model.name + '_Model.png',
                    show_shapes=True)
 
