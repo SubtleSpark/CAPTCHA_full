@@ -1,6 +1,7 @@
 import os
 import config
-from NNModels import MyModel, VGG, SEResNet50, ResNet50, ResNet34
+from NNModels import *
+from NNModels import MyModel
 
 from util.modelUtils import word_acc
 from keras.callbacks import EarlyStopping, CSVLogger, ModelCheckpoint
@@ -37,17 +38,28 @@ valid_prob_from = config.Valid.valid_prob_from
 valid_prob_to = config.Valid.valid_prob_to
 
 
+# from .VGG import VGG
+# from .ResNet34 import ResNet34
+# from .ResNet50 import ResNet50
+# from .KerasResNet50 import KerasResNet50
+# from .SEResNet50 import SEResNet50
+# from .SEResNet50_h import SEResNet50_h
+
 def main(weight_path: str = None):
     # 加载模型结构
     nnm: MyModel = None
-    if model_name == 'SEResNet50':
-        nnm = SEResNet50(inputShape=input_shape, regularizer=0.001, droprate=0.5)
-    elif model_name == 'ResNet50':
-        nnm = ResNet50(inputShape=input_shape, regularizer=0.001, droprate=0.5)
-    elif model_name == 'VGG':
+    if model_name == 'VGG':
         nnm = VGG(inputShape=input_shape, regularizer=0.001, droprate=0.5)
     elif model_name == 'ResNet34':
         nnm = ResNet34(inputShape=input_shape, regularizer=0.001, droprate=0.5)
+    elif model_name == 'ResNet50':
+        nnm = ResNet50(inputShape=input_shape, regularizer=0.001, droprate=0.5)
+    elif model_name == 'KerasResNet50':
+        nnm = KerasResNet50(inputShape=input_shape, regularizer=0.001, droprate=0.5)
+    elif model_name == 'SEResNet50':
+        nnm = SEResNet50(inputShape=input_shape, regularizer=0.001, droprate=0.5)
+    elif model_name == 'SEResNet50_h':
+        nnm = SEResNet50_h(inputShape=input_shape, regularizer=0.001, droprate=0.5)
 
     model = nnm.getModel()
 
