@@ -6,7 +6,7 @@ class Model:
     model_data = "./model_data"  # 训练生成的checkpoint和日志文件保存的文件夹
     model_path = "./model_data/cnn_best.h5"  # 加载的模型
     __h__ = 64      # 图片高度
-    __w__ = 256     # 图片宽度
+    __w__ = 128     # 图片宽度
     input_shape = (__h__, __w__, 3)  # 模型输入为（h, w, c）  cv的图像大小为(w, h)
     img_shape = (__w__, __h__)
 
@@ -15,17 +15,17 @@ class Train:
     """
     训练集
     """
-    train_data_folder = "/root/work/captcha/A/train/"
-    train_data_file = "/root/work/captcha/A/train/train_label.csv"
+    train_data_folder = "/root/work/captcha/train/"
+    train_data_file = "/root/work/captcha/train/train_label.csv"
     train_prob_from = 0
-    train_prob_to = 0.8
+    train_prob_to = 1
 
     """
     超参数
     """
-    batch_size = 32
+    batch_size = 64
     learning_rate = 0.001
-    warmup_epochs = 5
+    warmup_epochs = 0
     nb_epochs = 200
 
     """
@@ -41,10 +41,10 @@ class Valid:
     """
     验证集
     """
-    valid_data_folder = "/root/work/captcha/A/train/"
-    valid_data_file = "/root/work/captcha/A/train/train_label.csv"
+    valid_data_folder = "/root/work/captcha/test/"
+    valid_data_file = "/root/work/captcha/test/test_label.csv"
     valid_prob_from = 0
-    valid_prob_to = 0.8
+    valid_prob_to = 0
     valid_times = 1
 
 

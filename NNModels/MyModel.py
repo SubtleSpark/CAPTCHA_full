@@ -64,7 +64,7 @@ class MyModel:
         X2 = Dense(62, kernel_regularizer=l2(regularizer), activation='softmax', name='out1')(X)
         X3 = Dense(62, kernel_regularizer=l2(regularizer), activation='softmax', name='out2')(X)
         X4 = Dense(62, kernel_regularizer=l2(regularizer), activation='softmax', name='out3')(X)
-        X = Concatenate(axis=-1)([X1, X2, X3, X4])
+        X = Concatenate()([X1, X2, X3, X4])
         model_output = Reshape(target_shape=(4, 62))(X)
 
         return model_output
@@ -75,7 +75,7 @@ class MyModel:
             return
 
         self.model.summary()
-        print('[INFO] ' +  self.model.name + 'is plotting')
+        print('[INFO] ' +  self.model.name + ' is plotting')
         plot_model(model=self.model, to_file='../model_data/model_summary/' + self.model.name + '_Model.png',
                    show_shapes=True)
 

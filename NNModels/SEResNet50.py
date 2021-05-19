@@ -1,6 +1,5 @@
 from keras.regularizers import l2
-from keras.layers import *
-from keras import Model
+from keras import Model, layers
 from .MyModel import MyModel
 
 
@@ -11,89 +10,160 @@ class SEResNet50(MyModel):
     """
     相较原始SEResNet50，每一层通道变为原来一半
     """
+
     def createModel(self):
-        model_input = Input(shape=self.inputShape)
-        identity_blocks = [3, 4, 6, 3]
-        # Block 1
-        layer = Conv2D(32, kernel_size=3, strides=1,
-                       padding='same', kernel_initializer='he_normal',
-                       use_bias=False)(model_input)
-        layer = BatchNormalization()(layer)
-        layer = ReLU()(layer)
-        block_1 = MaxPooling2D(3, strides=2, padding='same')(layer)
+        model_input = layers.Input(shape=self.inputShape)
+        x = layers.ZeroPadding2D(padding=(3, 3), name='conv1_pad')(model_input)
+        x = layers.Conv2D(64, (7, 7),
+                          strides=(2, 2),
+                          padding='valid',
+                          kernel_initializer='he_normal',
+                          name='conv1')(x)
+        x = layers.BatchNormalization(name='bn_conv1')(x)
+        x = layers.Activation('relu')(x)
+        x = layers.ZeroPadding2D(padding=(1, 1), name='pool1_pad')(x)
+        x = layers.MaxPooling2D((3, 3), strides=(2, 2))(x)
 
-        # Block 2
-        block_2 = self.__conv_block(block_1, 32)
-        block_2 = self.__squeeze_excitation_layer(block_2, out_dim=128, ratio=32.0, conv=True)
-        for _ in range(identity_blocks[0] - 1):
-            block_2 = self.__conv_block(block_1, 32)
-            block_2 = self.__squeeze_excitation_layer(block_2, out_dim=128, ratio=32.0, conv=False)
+        x = conv_block(x, 3, [64, 64, 256], stage=2, block='a', strides=(1, 1))
+        x = identity_block(x, 3, [64, 64, 256], stage=2, block='b')
+        x = identity_block(x, 3, [64, 64, 256], stage=2, block='c')
 
-        # Block 3
-        block_3 = self.__conv_block(block_2, 64)
-        block_3 = self.__squeeze_excitation_layer(block_3, out_dim=256, ratio=32.0, conv=True)
-        for _ in range(identity_blocks[1] - 1):
-            block_3 = self.__conv_block(block_2, 64)
-            block_3 = self.__squeeze_excitation_layer(block_3, out_dim=256, ratio=32.0, conv=False)
+        x = conv_block(x, 3, [128, 128, 512], stage=3, block='a')
+        x = identity_block(x, 3, [128, 128, 512], stage=3, block='b')
+        x = identity_block(x, 3, [128, 128, 512], stage=3, block='c')
+        x = identity_block(x, 3, [128, 128, 512], stage=3, block='d')
 
-        # Block 4
-        block_4 = self.__conv_block(block_3, 128)
-        block_4 = self.__squeeze_excitation_layer(block_4, out_dim=512, ratio=32.0, conv=True)
-        for _ in range(identity_blocks[2] - 1):
-            block_4 = self.__conv_block(block_3, 128)
-            block_4 = self.__squeeze_excitation_layer(block_4, out_dim=512, ratio=32.0, conv=False)
+        x = conv_block(x, 3, [256, 256, 1024], stage=4, block='a')
+        x = identity_block(x, 3, [256, 256, 1024], stage=4, block='b')
+        x = identity_block(x, 3, [256, 256, 1024], stage=4, block='c')
+        x = identity_block(x, 3, [256, 256, 1024], stage=4, block='d')
+        x = identity_block(x, 3, [256, 256, 1024], stage=4, block='e')
+        x = identity_block(x, 3, [256, 256, 1024], stage=4, block='f')
 
-        # Block 5
-        block_5 = self.__conv_block(block_4, 256)
-        block_5 = self.__squeeze_excitation_layer(block_5, out_dim=1024, ratio=32.0, conv=True)
-        for _ in range(identity_blocks[2] - 1):
-            block_5 = self.__conv_block(block_4, 256)
-            block_5 = self.__squeeze_excitation_layer(block_5, out_dim=1024, ratio=32.0, conv=False)
+        x = conv_block(x, 3, [512, 512, 2048], stage=5, block='a')
+        x = identity_block(x, 3, [512, 512, 2048], stage=5, block='b')
+        x = identity_block(x, 3, [512, 512, 2048], stage=5, block='c')
 
-        pooling = GlobalAveragePooling2D()(block_5)
+        x = layers.GlobalAveragePooling2D(name='avg_pool')(x)
 
         """
         添加 top 分类器
         """
-        model_output = self.top(self.droprate, self.regularizer, pooling)
+        model_output = self.top(self.droprate, self.regularizer, x)
         model: Model = Model(inputs=model_input, outputs=model_output, name=self.__class__.__name__)
 
         return model
 
-    def __squeeze_excitation_layer(self, input_layer, out_dim, ratio, conv):
-        squeeze = GlobalAveragePooling2D()(input_layer)
 
-        excitation = Dense(units=int(out_dim / ratio), activation='relu')(squeeze)
-        excitation = Dense(out_dim, activation='sigmoid')(excitation)
-        excitation = Reshape([1, 1, out_dim])(excitation)
+def identity_block(input_tensor, kernel_size, filters, stage, block):
+    """The identity block is the block that has no conv layer at shortcut.
 
-        scale = multiply([input_layer, excitation])
+    # Arguments
+        input_tensor: input tensor
+        kernel_size: default 3, the kernel size of
+            middle conv layer at main path
+        filters: list of integers, the filters of 3 conv layer at main path
+        stage: integer, current stage label, used for generating layer names
+        block: 'a','b'..., current block label, used for generating layer names
 
-        if conv:
-            shortcut = Conv2D(out_dim, kernel_size=1, strides=1, padding='same', kernel_initializer='he_normal')(
-                input_layer)
-            shortcut = BatchNormalization()(shortcut)
-        else:
-            shortcut = input_layer
-        out = add([shortcut, scale])
-        return out
+    # Returns
+        Output tensor for the block.
+    """
+    filters1, filters2, filters3 = filters
+    conv_name_base = 'res' + str(stage) + block + '_branch'
+    bn_name_base = 'bn' + str(stage) + block + '_branch'
 
-    def __conv_block(self, input_layer, filters):
-        layer = Conv2D(filters, kernel_size=1, strides=1,
-                       padding='same', kernel_initializer='he_normal',
-                       use_bias=False)(input_layer)
-        layer = BatchNormalization()(layer)
-        layer = ReLU()(layer)
+    x = layers.Conv2D(filters1, (1, 1),
+                      kernel_initializer='he_normal',
+                      name=conv_name_base + '2a')(input_tensor)
+    x = layers.BatchNormalization(name=bn_name_base + '2a')(x)
+    x = layers.Activation('relu')(x)
 
-        layer = Conv2D(filters, kernel_size=3, strides=1,
-                       padding='same', kernel_initializer='he_normal',
-                       use_bias=False)(layer)
-        layer = BatchNormalization()(layer)
-        layer = ReLU()(layer)
+    x = layers.Conv2D(filters2, kernel_size,
+                      padding='same',
+                      kernel_initializer='he_normal',
+                      name=conv_name_base + '2b')(x)
+    x = layers.BatchNormalization(name=bn_name_base + '2b')(x)
+    x = layers.Activation('relu')(x)
 
-        layer = Conv2D(filters * 4, kernel_size=1, strides=1,
-                       padding='same', kernel_initializer='he_normal',
-                       use_bias=False)(layer)
-        layer = BatchNormalization()(layer)
-        layer = ReLU()(layer)
-        return layer
+    x = layers.Conv2D(filters3, (1, 1),
+                      kernel_initializer='he_normal',
+                      name=conv_name_base + '2c')(x)
+    x = layers.BatchNormalization(name=bn_name_base + '2c')(x)
+
+    # se_module
+    shape = x.get_shape().as_list()
+    channel = shape[-1]
+
+    squeeze = layers.GlobalAveragePooling2D()(x)
+
+    excitation = layers.Dense(units=int(channel / 16), activation='relu')(squeeze)
+    excitation = layers.Dense(channel, activation='sigmoid')(excitation)
+    excitation = layers.Reshape([1, 1, channel])(excitation)
+    se_module = layers.multiply([x, excitation])
+
+    # add
+    x = layers.add([se_module, input_tensor])
+    x = layers.Activation('relu')(x)
+    return x
+
+
+def conv_block(input_tensor,
+               kernel_size,
+               filters,
+               stage,
+               block,
+               strides=(2, 2)):
+    """A block that has a conv layer at shortcut.
+
+    # Arguments
+        input_tensor: input tensor
+        kernel_size: default 3, the kernel size of
+            middle conv layer at main path
+        filters: list of integers, the filters of 3 conv layer at main path
+        stage: integer, current stage label, used for generating layer names
+        block: 'a','b'..., current block label, used for generating layer names
+        strides: Strides for the first conv layer in the block.
+
+    # Returns
+        Output tensor for the block.
+
+    Note that from stage 3,
+    the first conv layer at main path is with strides=(2, 2)
+    And the shortcut should have strides=(2, 2) as well
+    """
+    filters1, filters2, filters3 = filters
+    bn_axis = 3
+
+    conv_name_base = 'res' + str(stage) + block + '_branch'
+    bn_name_base = 'bn' + str(stage) + block + '_branch'
+
+    # conv
+    x = layers.Conv2D(filters1, (1, 1), strides=strides,
+                      kernel_initializer='he_normal',
+                      name=conv_name_base + '2a')(input_tensor)
+    x = layers.BatchNormalization(name=bn_name_base + '2a')(x)
+    x = layers.Activation('relu')(x)
+
+    x = layers.Conv2D(filters2, kernel_size, padding='same',
+                      kernel_initializer='he_normal',
+                      name=conv_name_base + '2b')(x)
+    x = layers.BatchNormalization(name=bn_name_base + '2b')(x)
+    x = layers.Activation('relu')(x)
+
+    x = layers.Conv2D(filters3, (1, 1),
+                      kernel_initializer='he_normal',
+                      name=conv_name_base + '2c')(x)
+    x = layers.BatchNormalization(name=bn_name_base + '2c')(x)
+
+    # shortcut
+    shortcut = layers.Conv2D(filters3, (1, 1), strides=strides,
+                             kernel_initializer='he_normal',
+                             name=conv_name_base + '1')(input_tensor)
+    shortcut = layers.BatchNormalization(
+        name=bn_name_base + '1')(shortcut)
+
+    # conv + shortcut
+    x = layers.add([x, shortcut])
+    x = layers.Activation('relu')(x)
+    return x
