@@ -1,11 +1,12 @@
 import os
 import config
+from NNModels import MyModel, VGG, SEResNet50, ResNet50, ResNet34
+
 from util.modelUtils import word_acc
-from keras.utils import plot_model
 from keras.callbacks import EarlyStopping, CSVLogger, ModelCheckpoint
 from keras.optimizers import *
 from DataGenerator import DataGenerator
-from NNModels import MyModel, VGG, SEResNet50, ResNet50, ResNet34
+from argparse import ArgumentParser
 
 """
 1. 读取配置文件

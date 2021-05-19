@@ -44,7 +44,7 @@ class Valid:
     valid_data_folder = "/root/work/captcha/test/"
     valid_data_file = "/root/work/captcha/test/test_label.csv"
     valid_prob_from = 0
-    valid_prob_to = 0
+    valid_prob_to = 1
     valid_times = 1
 
 
@@ -59,11 +59,11 @@ class Predict:
 import sys
 
 if sys.platform == "win32":
-    Train.train_data_folder = "F:/data_set/captcha/A/train/"
-    Train.train_data_file = "F:/data_set/captcha/A/train/train_label.csv"
+    Train.train_data_folder = "F:/data_set/captcha/train/"
+    Train.train_data_file = "F:/data_set/captcha/train/train_label.csv"
     Train.batch_size = 2
     Train.warmup_epochs = 0
     Train.workers = 1
 
-    Valid.valid_data_folder = "F:/data_set/captcha/A/train/"
-    Valid.valid_data_file = "F:/data_set/captcha/A/train/train_label.csv"
+    Valid.valid_data_folder = "F:/data_set/captcha/train/"
+    Valid.valid_data_file = "F:/data_set/captcha/train/train_label.csv"

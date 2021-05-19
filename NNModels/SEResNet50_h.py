@@ -1,12 +1,15 @@
-from keras import Input, Model, layers
-import keras
+from keras.regularizers import l2
+from keras import Model, layers
 from .MyModel import MyModel
 
 
-class ResNet50(MyModel):
-    def __init__(self, inputShape=(40, 120, 3), droprate=0.5, regularizer=0.001, weights='imagenet'):
-        self.weights = weights
+class SEResNet50_h(MyModel):
+    def __init__(self, inputShape=(40, 120, 3), droprate=0.5, regularizer=0.01):
         super().__init__(inputShape=inputShape, droprate=droprate, regularizer=regularizer)
+
+    """
+    相较原始SEResNet50，每一层通道变为原来一半
+    """
 
     def createModel(self):
         model_input = layers.Input(shape=self.inputShape)
@@ -21,25 +24,25 @@ class ResNet50(MyModel):
         x = layers.ZeroPadding2D(padding=(1, 1), name='pool1_pad')(x)
         x = layers.MaxPooling2D((3, 3), strides=(2, 2))(x)
 
-        x = conv_block(x, 3, [64, 64, 256], stage=2, block='a', strides=(1, 1))
-        x = identity_block(x, 3, [64, 64, 256], stage=2, block='b')
-        x = identity_block(x, 3, [64, 64, 256], stage=2, block='c')
+        x = conv_block(x, 3, [32, 32, 128], stage=2, block='a', strides=(1, 1))
+        x = identity_block(x, 3, [32, 32, 128], stage=2, block='b')
+        x = identity_block(x, 3, [32, 32, 128], stage=2, block='c')
 
-        x = conv_block(x, 3, [128, 128, 512], stage=3, block='a')
-        x = identity_block(x, 3, [128, 128, 512], stage=3, block='b')
-        x = identity_block(x, 3, [128, 128, 512], stage=3, block='c')
-        x = identity_block(x, 3, [128, 128, 512], stage=3, block='d')
+        x = conv_block(x, 3, [64, 64, 256], stage=3, block='a')
+        x = identity_block(x, 3, [64, 64, 256], stage=3, block='b')
+        x = identity_block(x, 3, [64, 64, 256], stage=3, block='c')
+        x = identity_block(x, 3, [64, 64, 256], stage=3, block='d')
 
-        x = conv_block(x, 3, [256, 256, 1024], stage=4, block='a')
-        x = identity_block(x, 3, [256, 256, 1024], stage=4, block='b')
-        x = identity_block(x, 3, [256, 256, 1024], stage=4, block='c')
-        x = identity_block(x, 3, [256, 256, 1024], stage=4, block='d')
-        x = identity_block(x, 3, [256, 256, 1024], stage=4, block='e')
-        x = identity_block(x, 3, [256, 256, 1024], stage=4, block='f')
+        x = conv_block(x, 3, [128, 128, 512], stage=4, block='a')
+        x = identity_block(x, 3, [128, 128, 512], stage=4, block='b')
+        x = identity_block(x, 3, [128, 128, 512], stage=4, block='c')
+        x = identity_block(x, 3, [128, 128, 512], stage=4, block='d')
+        x = identity_block(x, 3, [128, 128, 512], stage=4, block='e')
+        x = identity_block(x, 3, [128, 128, 512], stage=4, block='f')
 
-        x = conv_block(x, 3, [512, 512, 2048], stage=5, block='a')
-        x = identity_block(x, 3, [512, 512, 2048], stage=5, block='b')
-        x = identity_block(x, 3, [512, 512, 2048], stage=5, block='c')
+        x = conv_block(x, 3, [256, 256, 1024], stage=5, block='a')
+        x = identity_block(x, 3, [256, 256, 1024], stage=5, block='b')
+        x = identity_block(x, 3, [256, 256, 1024], stage=5, block='c')
 
         x = layers.GlobalAveragePooling2D(name='avg_pool')(x)
 
@@ -50,7 +53,6 @@ class ResNet50(MyModel):
         model: Model = Model(inputs=model_input, outputs=model_output, name=self.__class__.__name__)
 
         return model
-
 
 
 def identity_block(input_tensor, kernel_size, filters, stage, block):
@@ -89,8 +91,19 @@ def identity_block(input_tensor, kernel_size, filters, stage, block):
                       name=conv_name_base + '2c')(x)
     x = layers.BatchNormalization(name=bn_name_base + '2c')(x)
 
+    # se_module
+    shape = x.get_shape().as_list()
+    channel = shape[-1]
+
+    squeeze = layers.GlobalAveragePooling2D()(x)
+
+    excitation = layers.Dense(units=int(channel / 16), activation='relu')(squeeze)
+    excitation = layers.Dense(channel, activation='sigmoid')(excitation)
+    excitation = layers.Reshape([1, 1, channel])(excitation)
+    se_module = layers.multiply([x, excitation])
+
     # add
-    x = layers.add([x, input_tensor])
+    x = layers.add([se_module, input_tensor])
     x = layers.Activation('relu')(x)
     return x
 
@@ -154,8 +167,3 @@ def conv_block(input_tensor,
     x = layers.add([x, shortcut])
     x = layers.Activation('relu')(x)
     return x
-
-
-
-
-
