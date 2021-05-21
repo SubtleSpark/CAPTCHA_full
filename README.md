@@ -1,23 +1,31 @@
 # CAPTCHA_full 验证码识别完整项目
 
-## 让项目跑起来
-1. 运行`sh request.sh`安装必要的包
+## 如何让项目跑起来
+1. 配置环境，运行安装必要的包
 2. config.py 下配置好正确的参数
 3. 运行 train.py 训练模型
 4. （微调模型）
 5. （多模型融合）
 6. 预测
 
+## 1. 环境和相关的包
+```shell
+conda install -y tensorflow-gpu=1.12.0
+conda install -y keras-gpu=2.2.4
+conda install -y opencv=3.3.1
+conda install -y imgaug=0.4.0
+conda install -y pydot=1.4.1
+```
 
-## 1. 在config.json中配置数据集路径
+## 2. 在config.json中配置数据集路径
 
-（以后可能将`config.py`作为配置文件）
+（已将`config.py`作为配置文件）
 
 `config.json` 中的属性 示例及解释
 ```json
 {
   "model": {
-    "backend": "tensorflow",
+    "model": "tensorflow",
     "model_data": "./model_data",             // train后保存的目录
     "model_path": "./model_data/cnn_best.h5", // 预测时读取的模型文件
     "input_size": [         // 神经网络输入大小
@@ -59,15 +67,28 @@
 }
 ```
 
-## 2.运行`train.py`训练模型
-1. 运行`train.py`训练模型
+## 3. train.py 训练模型
+### 参数
 
-2. `model_data/{model_name}/train_log.csv`会实时记录训练数据
+-m 使用的模型名字 如VGG、ResNet50、SEResNet50
 
-3. 模型会保存在`model_data/{model_name}/checkpoint/`文件夹下
+-p 加载的模型权重文件
 
-## 3.
+### 运行效果
+
+1. `model_data/{model_name}/train_log.csv`会实时记录训练数据
+
+2. 模型会保存在`model_data/{model_name}/checkpoint/`文件夹下
+
+3. 还有其他的训练结果会保存下来
+
+## 4. 运行fineTuning 微调模型
+### 参数
+
+-m 使用的模型名字 如SEResNet50
+
+-p 加载的模型权重文件
 
 
-## 参考思路
+# 参考思路
 ![](参考思路.jpg)

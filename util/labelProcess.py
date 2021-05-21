@@ -51,6 +51,8 @@ if __name__ == '__main__':
     测试标签处理功能
     """
     lab1 = process_label('0aa0')
+    print(lab1)
+
     lab2 = np.zeros(shape=(4, 62))
     lab2[0][10] = 0.9
     lab2[1][2] = 0.9
@@ -58,4 +60,3 @@ if __name__ == '__main__':
     lab2[3][2] = 0.9
     res = decode_predict([lab1, lab2])
     print(res)
-    print(lab1)

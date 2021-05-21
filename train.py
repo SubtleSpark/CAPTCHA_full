@@ -4,7 +4,8 @@ from NNModels import *
 from NNModels import MyModel
 
 from util.modelUtils import word_acc
-from keras.callbacks import EarlyStopping, CSVLogger, ModelCheckpoint
+from keras.callbacks import EarlyStopping, LearningRateScheduler, CSVLogger, ModelCheckpoint, TensorBoard, \
+    ReduceLROnPlateau
 from keras.optimizers import *
 from DataGenerator import DataGenerator
 from argparse import ArgumentParser
@@ -15,11 +16,12 @@ from argparse import ArgumentParser
 """
 # model
 model_data = config.Model.model_data
-model_name = config.Model.backend
+model_name = config.Model.model
 input_shape = config.Model.input_shape
 img_shape = config.Model.img_shape
 
 # train
+use_preweight = config.Train.use_preweight
 pretrained_weights = config.Train.pretrained_weights
 train_file = config.Train.train_data_file
 train_dir = config.Train.train_data_folder
@@ -45,7 +47,7 @@ valid_prob_to = config.Valid.valid_prob_to
 # from .SEResNet50 import SEResNet50
 # from .SEResNet50_h import SEResNet50_h
 
-def main(weight_path: str = None):
+def main():
     # 加载模型结构
     nnm: MyModel = None
     if model_name == 'VGG':
@@ -60,6 +62,8 @@ def main(weight_path: str = None):
         nnm = SEResNet50(inputShape=input_shape, regularizer=0.001, droprate=0.5)
     elif model_name == 'SEResNet50_h':
         nnm = SEResNet50_h(inputShape=input_shape, regularizer=0.001, droprate=0.5)
+    else:
+        print('[ERROR] model_name ' + model_name + 'not find')
 
     model = nnm.getModel()
 
@@ -67,9 +71,9 @@ def main(weight_path: str = None):
     根据参数加载模型数据
     """
     # 读取权重
-    if weight_path is not None:
-        print(weight_path)
-        model.load_weights(filepath=pretrained_weights, by_name=True, skip_mismatch=False)
+    if use_preweight:
+        model.load_weights(filepath=pretrained_weights, by_name=True, skip_mismatch=True)
+        print('[INFO] using Weight ----> ' + pretrained_weights)
 
     # 编译模型
     model.compile(optimizer=Adam(0.001, amsgrad=True),
@@ -111,11 +115,15 @@ def main(weight_path: str = None):
     if not (os.path.exists(os.path.join(model_data, model.name, 'checkpoints'))):
         os.makedirs(os.path.join(model_data, model.name, 'checkpoints'))
 
-    # filepath = "./model_data/model.{epoch:02d}-{val_loss:.8f}.h5"
-    filepath = os.path.join(model_data, model.name, 'checkpoints', model.name + '.h5')
+    csvLogger = os.path.join(model_data, model.name, 'train_log.csv')
+    tensorBoardLog = os.path.join(model_data, model.name, 'logs')
+    # modelCheckPoint = "./model_data/model.{epoch:02d}-{val_loss:.8f}.h5"
+    modelCheckPoint = os.path.join(model_data, model.name, 'checkpoints', model.name + '.h5')
     callbacks = [EarlyStopping(monitor='val_loss', patience=18),
-                 CSVLogger(os.path.join(model_data, model.name, 'train_log.csv')),
-                 ModelCheckpoint(filepath=filepath,
+                 ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=6, verbose=1),
+                 CSVLogger(filename=csvLogger),
+                 TensorBoard(log_dir=tensorBoardLog),
+                 ModelCheckpoint(filepath=modelCheckPoint,
                                  monitor='val_loss',
                                  verbose=1,
                                  save_best_only=True,
@@ -132,4 +140,18 @@ def main(weight_path: str = None):
 
 
 if __name__ == '__main__':
+    parser = ArgumentParser()
+    parser.add_argument('-m', '--model')
+    parser.add_argument('-p', '--preweight')
+
+    args = parser.parse_args()
+
+    if args.model is not None:
+        model_name = args.model
+        print('[INFO] ArgumentParser: model = ' + args.model)
+    if args.preweight is not None:
+        pretrained_weights = args.preweight
+        use_preweight = True
+        print('[INFO] ArgumentParser: preweight = ' + args.preweight)
+
     main()

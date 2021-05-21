@@ -4,8 +4,7 @@ from .MyModel import MyModel
 
 
 class ResNet50(MyModel):
-    def __init__(self, inputShape=(40, 120, 3), droprate=0.5, regularizer=0.001, weights='imagenet'):
-        self.weights = weights
+    def __init__(self, inputShape=(40, 120, 3), droprate=0.5, regularizer=0.001):
         super().__init__(inputShape=inputShape, droprate=droprate, regularizer=regularizer)
 
     def createModel(self):

@@ -72,6 +72,7 @@ def identity_block(input_tensor, kernel_size, filters, stage, block):
     filters1, filters2, filters3 = filters
     conv_name_base = 'res' + str(stage) + block + '_branch'
     bn_name_base = 'bn' + str(stage) + block + '_branch'
+    se_name_base = 'se_module' + str(stage) + block + '_branch'
 
     x = layers.Conv2D(filters1, (1, 1),
                       kernel_initializer='he_normal',
@@ -97,8 +98,8 @@ def identity_block(input_tensor, kernel_size, filters, stage, block):
 
     squeeze = layers.GlobalAveragePooling2D()(x)
 
-    excitation = layers.Dense(units=int(channel / 16), activation='relu')(squeeze)
-    excitation = layers.Dense(channel, activation='sigmoid')(excitation)
+    excitation = layers.Dense(units=int(channel / 16), activation='relu', name=se_name_base + 'f1')(squeeze)
+    excitation = layers.Dense(units=channel, activation='sigmoid', name=se_name_base + 'f2')(excitation)
     excitation = layers.Reshape([1, 1, channel])(excitation)
     se_module = layers.multiply([x, excitation])
 
