@@ -32,6 +32,7 @@ train_prob_to = config.Train.train_prob_to
 train_workers = config.Train.workers
 batch_size = config.Train.batch_size
 warmup_epochs = config.Train.warmup_epochs
+nb_epochs = config.Train.nb_epochs
 
 # valid
 valid_file = config.Valid.valid_data_file
@@ -132,7 +133,7 @@ def main():
                                  period=2)]
 
     model.fit_generator(train_data_gen,
-                        epochs=200,
+                        epochs=nb_epochs,
                         validation_data=valid_data_gen,
                         workers=train_workers,
                         use_multiprocessing=True,
