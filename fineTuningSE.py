@@ -56,6 +56,7 @@ def main():
         nnm = SEResNet50_h(inputShape=input_shape, regularizer=0.001, droprate=0.5)
     else:
         print('[ERROR] model_name ' + model_name + ' not find')
+        return
 
     model = nnm.getModel()
 
@@ -84,9 +85,9 @@ def main():
     2. 解冻分类器，继续训练        epoch2
     3. 解冻整个网络，继续训练      epoch3
     """
-    epoch1 = 200
-    epoch2 = 200
-    epoch3 = 200
+    epoch1 = 500
+    epoch2 = 500
+    epoch3 = 500
 
     """
     1. 只训练SE模块

@@ -72,7 +72,7 @@ def main():
     根据参数加载模型数据
     """
     # 读取权重
-    if use_preweight:
+    if use_preweight is not None:
         model.load_weights(filepath=pretrained_weights, by_name=True, skip_mismatch=True)
         print('[INFO] using Weight ----> ' + pretrained_weights)
 

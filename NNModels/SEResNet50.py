@@ -55,6 +55,7 @@ class SEResNet50(MyModel):
         return model
 
 
+
 def identity_block(input_tensor, kernel_size, filters, stage, block):
     """The identity block is the block that has no conv layer at shortcut.
 
