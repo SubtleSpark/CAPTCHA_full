@@ -24,7 +24,7 @@ def buildModel(paths):
     构建模型
     """
     modelList = []
-    model_num = len(paths)
+    model_num: int = len(paths)
     char_num = 62
 
     for path in paths:
@@ -67,6 +67,7 @@ def buildModel(paths):
     a = GlobalAvgPool2D()(w)
     m = GlobalMaxPool2D()(w)
     w = Concatenate()([a, m])
+    w = Dense(model_num * 16, activation='relu')(w)
     w = Dense(model_num, activation='softmax')(w)
 
     """
@@ -83,7 +84,7 @@ def buildModel(paths):
 
     out = Concatenate()([out0, out1, out2, out3])
     out = Reshape((4, 62))(out)
-    model = Model(input, out, name='mergedModel_' + model_num)
+    model = Model(input, out, name='mergedModel_' + str(model_num))
     return model
 
 
