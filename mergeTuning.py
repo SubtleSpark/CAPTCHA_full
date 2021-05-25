@@ -62,12 +62,28 @@ def buildModel(paths):
     """
     生成权重
     """
-    w = Conv2D(filters=64, kernel_size=3, strides=2, padding='same', activation='relu')(input)
-    w = Conv2D(filters=128, kernel_size=3, strides=2, padding='same', activation='relu')(w)
+    w = Conv2D(64 , kernel_size=3, padding='same')(input)
+    w = BatchNormalization()(w)
+    w = Activation('relu')(w)
+
+    w = Conv2D(64, kernel_size=3, padding='same')(w)
+    w = BatchNormalization()(w)
+    w = Activation('relu')(w)
+    w = MaxPool2D((3, 3), strides=2)(w)
+
+    w = Conv2D(128, kernel_size=3, padding='same')(w)
+    w = BatchNormalization()(w)
+    w = Activation('relu')(w)
+
+    w = Conv2D(512, kernel_size=3, padding='same')(w)
+    w = BatchNormalization()(w)
+    w = Activation('relu')(w)
+
     a = GlobalAvgPool2D()(w)
     m = GlobalMaxPool2D()(w)
     w = Concatenate()([a, m])
     w = Dense(model_num * 16, activation='relu')(w)
+    w = Dense(model_num * 4, activation='relu')(w)
     w = Dense(model_num, activation='softmax')(w)
 
     """
