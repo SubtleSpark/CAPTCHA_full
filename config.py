@@ -23,7 +23,7 @@ class Train:
     """
     超参数
     """
-    batch_size = 64
+    batch_size = 32
     learning_rate = 0.001
     warmup_epochs = 0
     nb_epochs = 500
@@ -56,7 +56,7 @@ class Predict:
 
 class Merge:
     model_paths = [r'/root/work/model_data/KerasResNet50/checkpoints/KerasResNet50.h5',
-                   r'/root/work/model_data/VGG/checkpoints/VGG.h5',
+                   # r'/root/work/model_data/VGG/checkpoints/VGG.h5',
                    r'/root/work/model_data/SEResNet50/checkpoints/SEResNet50.h5'
                    ]
 
