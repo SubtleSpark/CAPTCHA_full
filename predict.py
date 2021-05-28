@@ -1,6 +1,7 @@
 import json
 import os
 import time
+from argparse import ArgumentParser
 
 import numpy as np
 import pandas as pd
@@ -14,13 +15,12 @@ from util.modelUtils import word_acc
 from util import labelProcess
 
 
-def model(testpath):
+def model(model_path, testpath):
     # your model goes here
     # 在这里放入或者读入模型文件
     # model_path = r"./model_data/model.138-0.06.h5"  # 0.9774
 
     # load model
-    model_path = config.Model.model_path
     model: Model = load_model(model_path, custom_objects={"word_acc": word_acc})
 
     # load data
@@ -60,20 +60,23 @@ def get_data(path):
     x = imread(filename=path)
 
     # 去噪,并归一化
-    x = imgProcessNorm(x)
-
-    x = resize(x, dsize=(120, 40))
+    x = imgProcessNorm(x, config.Model.img_shape)
     return x
 
 
 if __name__ == "__main__":
     testpath = config.Predict.predict_data_folder  # 测试集路径。包含验证码图片文件的文件夹
     result_folder_path = config.Predict.predict_result_file  # 结果输出文件路径
+    model_path = config.Model.model_path
 
-    # 调用自己的工程文件，并这里生成结果文件(dataframe)
-    result = model(testpath)
-    print(result)
+    # 参数
+    parser = ArgumentParser()
+    parser.add_argument('-m', '--model')
+    args = parser.parse_args()
 
-    # 注意路径不能更改，index需要设置为None
+    if args.model is not None:
+        model_path = args.model
+        print('[INFO] ArgumentParser: model = ' + args.model)
+
+    result = model(model_path, testpath)
     result.to_csv(result_folder_path, index=None)
-    # 参考代码结束：输出标准结果文件

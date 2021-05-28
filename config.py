@@ -50,8 +50,8 @@ class Valid:
 
 
 class Predict:
-    predict_data_folder = "/root/work/captcha/test/",
-    predict_result_file = "./submission.csv"
+    predict_data_folder = "/root/work/captcha/test/"
+    predict_result_file = "./result.csv"
 
 
 class Merge:
