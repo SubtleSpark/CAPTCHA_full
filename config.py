@@ -4,7 +4,7 @@ class Model:
     """
     model = "VGG"  # 使用的模型 NNModels 中的 模型名
     model_data = "./model_data"  # 训练生成的checkpoint和日志文件保存的文件夹
-    model_path = None  # 加载的模型
+    model_path = "/root/work/model_data/KerasResNet50/checkpoints/KerasResNet50.h5"  # 加载的模型
     __h__ = 64  # 图片高度
     __w__ = 256  # 图片宽度
     input_shape = (__h__, __w__, 3)  # 模型输入为（h, w, c）  cv的图像大小为(w, h)
@@ -50,8 +50,8 @@ class Valid:
 
 
 class Predict:
-    predict_data_folder = "./data/test",
-    predict_data_file = "./data/submission.csv"
+    predict_data_folder = "/root/work/captcha/test/",
+    predict_result_file = "./submission.csv"
 
 
 class Merge:
