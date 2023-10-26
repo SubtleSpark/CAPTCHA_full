@@ -1,16 +1,11 @@
-import string
-
-import cv2
 import numpy as np
-import keras.backend as K
-from keras.metrics import categorical_accuracy
 
-wordlist = list('0123456789') + list(string.ascii_letters)
+wordlist = list('0123456789')
 
 
 # 处理标签
 def process_label(label):
-    pro_lab = np.zeros(shape=(4, 62))
+    pro_lab = np.zeros(shape=(4, 10))
 
     label = list(label)
     for i in range(4):
@@ -50,13 +45,13 @@ if __name__ == '__main__':
     """
     测试标签处理功能
     """
-    lab1 = process_label('0aa0')
+    lab1 = process_label('0123')
     print(lab1)
 
-    lab2 = np.zeros(shape=(4, 62))
-    lab2[0][10] = 0.9
-    lab2[1][2] = 0.9
-    lab2[2][2] = 0.9
-    lab2[3][2] = 0.9
+    lab2 = np.zeros(shape=(4, 10))
+    lab2[0][2] = 0.9
+    lab2[1][3] = 0.9
+    lab2[2][0] = 0.9
+    lab2[3][9] = 0.9
     res = decode_predict([lab1, lab2])
     print(res)

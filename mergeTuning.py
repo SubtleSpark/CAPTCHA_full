@@ -118,7 +118,6 @@ if __name__ == '__main__':
     # train
     use_preweight = config.Train.use_preweight
     pretrained_weights = config.Train.pretrained_weights
-    train_file = config.Train.train_data_file
     train_dir = config.Train.train_data_folder
     train_prob_from = config.Train.train_prob_from
     train_prob_to = config.Train.train_prob_to
@@ -130,7 +129,6 @@ if __name__ == '__main__':
     nb_epochs = config.Train.nb_epochs
 
     # valid
-    valid_file = config.Valid.valid_data_file
     valid_dir = config.Valid.valid_data_folder
     valid_prob_from = config.Valid.valid_prob_from
     valid_prob_to = config.Valid.valid_prob_to
@@ -147,13 +145,13 @@ if __name__ == '__main__':
     创建数据生成器
     """
     # 训练数据生成器
-    train_data_gen = DataGenerator(data_file=train_file, data_dir=train_dir, img_shape=img_shape, batch_size=batch_size,
+    train_data_gen = DataGenerator(data_dir=train_dir, img_shape=img_shape, batch_size=batch_size,
                                    data_aug=True,
                                    prob_from=train_prob_from,
                                    prob_to=train_prob_to,
                                    shuffle=True)
     # 验证数据生成器
-    valid_data_gen = DataGenerator(data_file=valid_file, data_dir=valid_dir, img_shape=img_shape, batch_size=batch_size,
+    valid_data_gen = DataGenerator(data_dir=valid_dir, img_shape=img_shape, batch_size=batch_size,
                                    data_aug=False,
                                    prob_from=valid_prob_from,
                                    prob_to=valid_prob_to,

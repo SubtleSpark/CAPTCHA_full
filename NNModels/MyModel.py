@@ -60,12 +60,12 @@ class MyModel:
     def top(self, droprate, regularizer, input):
         # output layer
         X = Dropout(rate=droprate)(input)
-        X1 = Dense(62, kernel_regularizer=l2(regularizer), activation='softmax', name='out0')(X)
-        X2 = Dense(62, kernel_regularizer=l2(regularizer), activation='softmax', name='out1')(X)
-        X3 = Dense(62, kernel_regularizer=l2(regularizer), activation='softmax', name='out2')(X)
-        X4 = Dense(62, kernel_regularizer=l2(regularizer), activation='softmax', name='out3')(X)
+        X1 = Dense(10, kernel_regularizer=l2(regularizer), activation='softmax', name='out0')(X)
+        X2 = Dense(10, kernel_regularizer=l2(regularizer), activation='softmax', name='out1')(X)
+        X3 = Dense(10, kernel_regularizer=l2(regularizer), activation='softmax', name='out2')(X)
+        X4 = Dense(10, kernel_regularizer=l2(regularizer), activation='softmax', name='out3')(X)
         X = Concatenate()([X1, X2, X3, X4])
-        model_output = Reshape(target_shape=(4, 62))(X)
+        model_output = Reshape(target_shape=(4, 10))(X)
 
         return model_output
 

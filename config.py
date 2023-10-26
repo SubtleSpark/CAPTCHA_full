@@ -5,8 +5,8 @@ class Model:
     model = "VGG"  # 使用的模型 NNModels 中的 模型名
     model_data = "./model_data"  # 训练生成的checkpoint和日志文件保存的文件夹
     model_path = "/root/work/model_data/KerasResNet50/checkpoints/KerasResNet50.h5"  # 加载的模型
-    __h__ = 64  # 图片高度
-    __w__ = 256  # 图片宽度
+    __h__ = 32  # 图片高度
+    __w__ = 128  # 图片宽度
     input_shape = (__h__, __w__, 3)  # 模型输入为（h, w, c）  cv的图像大小为(w, h)
     img_shape = (__w__, __h__)
 
@@ -15,10 +15,9 @@ class Train:
     """
     训练集
     """
-    train_data_folder = "/root/work/captcha/train/"
-    train_data_file = "/root/work/captcha/train/train_label.csv"
+    train_data_folder = "E:\yzm"
     train_prob_from = 0
-    train_prob_to = 1
+    train_prob_to = 0.9
 
     """
     超参数
@@ -42,9 +41,8 @@ class Valid:
     """
     验证集
     """
-    valid_data_folder = "/root/work/captcha/test/"
-    valid_data_file = "/root/work/captcha/test/test_label.csv"
-    valid_prob_from = 0
+    valid_data_folder = "E:\yzm"
+    valid_prob_from = 0.9
     valid_prob_to = 1
     valid_times = 1
 
@@ -60,26 +58,3 @@ class Merge:
                    r'/root/work/model_data/SEResNet50/checkpoints/SEResNet50.h5'
                    ]
 
-
-"""
-本地测试时需要重写的路径
-"""
-import sys
-
-if sys.platform == "win32":
-    Train.train_data_folder = "F:/data_set/captcha/train/"
-    Train.train_data_file = "F:/data_set/captcha/train/train_label.csv"
-    Train.train_prob_from = 0
-    Train.train_prob_to = 0.1
-    Train.batch_size = 2
-    Train.warmup_epochs = 0
-    Train.workers = 1
-
-    Valid.valid_data_folder = "F:/data_set/captcha/train/"
-    Valid.valid_data_file = "F:/data_set/captcha/train/train_label.csv"
-    Valid.valid_prob_from = 0.1
-    Valid.valid_prob_to = 0.2
-
-    Merge.model_paths = [r'F:\model_data\KerasResNet50\checkpoints\KerasResNet50.h5',
-                         r'F:\model_data\KerasResNet50\checkpoints\KerasResNet50.h5'
-                         ]
