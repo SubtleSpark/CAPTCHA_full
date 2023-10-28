@@ -15,9 +15,9 @@ class Train:
     """
     训练集
     """
-    train_data_folder = "E:\yzm"
+    train_data_folder = r"E:\yzm\train"
     train_prob_from = 0
-    train_prob_to = 0.9
+    train_prob_to = 1
 
     """
     超参数
@@ -41,8 +41,8 @@ class Valid:
     """
     验证集
     """
-    valid_data_folder = "E:\yzm"
-    valid_prob_from = 0.9
+    valid_data_folder = r"E:\yzm\val"
+    valid_prob_from = 0
     valid_prob_to = 1
     valid_times = 1
 

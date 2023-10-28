@@ -103,7 +103,7 @@ def main():
     # 1. warmup
     if warmup_epochs > 0:
         print('[INFO]  warmup 训练')
-        model.fit_generator(train_data_gen,
+        model.fit(train_data_gen,
                             epochs=warmup_epochs,
                             validation_data=valid_data_gen,
                             workers=train_workers)
@@ -128,13 +128,13 @@ def main():
                                  save_best_only=True,
                                  save_weights_only=False,
                                  mode='auto',
-                                 period=2)]
+                                 save_freq='epoch')]
 
-    model.fit_generator(train_data_gen,
+    model.fit(train_data_gen,
                         epochs=nb_epochs,
                         validation_data=valid_data_gen,
                         workers=train_workers,
-                        use_multiprocessing=True,
+                        use_multiprocessing=False,
                         callbacks=callbacks)
 
 

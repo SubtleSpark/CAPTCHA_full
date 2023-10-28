@@ -120,10 +120,9 @@ def main():
                                  monitor='val_loss',
                                  verbose=1,
                                  save_best_only=True,
-                                 save_weights_only=False,
-                                 period=2)]
+                                 save_weights_only=False)]
 
-    model.fit_generator(train_data_gen,
+    model.fit(train_data_gen,
                         epochs=epoch1,
                         validation_data=valid_data_gen,
                         workers=train_workers,
