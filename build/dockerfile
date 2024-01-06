@@ -15,9 +15,8 @@ RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
 RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 
 # Install any needed packages
-RUN pip install --no-cache-dir fastapi==0.99.1 uvicorn
-RUN pip install --no-cache-dir imgaug==0.4.0
-RUN pip install --no-cache-dir opencv-python==4.8.1.78 opencv-python-headless
+RUN pip install --no-cache-dir fastapi==0.99.1 uvicorn python-multipart
+RUN pip install --no-cache-dir imgaug==0.4.0 opencv-python==4.8.1.78 opencv-python-headless
 
 # Make port 80 available to the world outside this container
 EXPOSE 80
