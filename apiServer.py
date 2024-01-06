@@ -13,7 +13,7 @@ from util import labelProcess
 
 app = FastAPI()
 
-model_path = r"E:\work\pythonProject\CAPTCHA_full\model_data\VGG\checkpoints\VGG.h5"
+model_path = r"./VGG.h5"
 model: Model = load_model(model_path, custom_objects={"word_acc": word_acc})
 
 

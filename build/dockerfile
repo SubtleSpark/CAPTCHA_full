@@ -1,0 +1,24 @@
+# Use an official image
+FROM tensorflow/tensorflow:2.10.0-gpu
+
+# Set the working directory in the container to /app
+WORKDIR /app
+
+# Copy the requirement file into the container at /app
+COPY ./apiServer.py /app/apiServer.py
+COPY ./util /app/util
+
+# pip 换源
+RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
+RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+
+# Install any needed packages
+RUN pip install --no-cache-dir fastapi==0.99.1 uvicorn
+RUN pip install --no-cache-dir imgaug==0.4.0
+RUN pip install --no-cache-dir opencv-python==4.8.1.78
+
+# Make port 80 available to the world outside this container
+EXPOSE 80
+
+# Run the command to start uWSGI
+CMD ["uvicorn", "apiServer:app", "--host", "0.0.0.0", "--port", "80"]
